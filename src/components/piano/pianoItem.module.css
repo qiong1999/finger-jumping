@@ -1,0 +1,51 @@
+button {
+    border: none;
+    outline: none;
+    background: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pianoItem {
+    display: inline-block;
+    position: relative;
+}
+.whiteKey {
+    display: inline-block;
+    width: 41px;
+    min-height: 200px;
+    padding-top: 160px;
+    background-color: FFFFFF;
+    border: 1px solid #bababa;
+    color: black;
+}
+
+.bkSet {
+    position: absolute;
+    top: 0;
+    display: flex;
+    justify-content: space-around;
+    width: 287px;
+}
+.blackKey {
+    display: inline-block;
+    background-color: black;
+    width: 27px;
+    min-height: 125px;
+    border: 1px solid #bababa;
+    margin-left: 7px;
+    margin-right: 7px;
+    padding-top: 85px;
+    color: #fff;
+}
+
+.wk,
+wk:focus {
+    background-image: linear-gradient(#fff, #fff, #fff, #f1f1f1);
+    border: 1px inset #f1f1f1;
+}
+.bk,
+bk:focus {
+    border: none;
+    outline: 0.5px solid;
+}

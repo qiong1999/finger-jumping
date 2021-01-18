@@ -8,6 +8,7 @@ export interface BasePianoProps {
     onSelect?: (selected: string) => void;
     children?: React.ReactNode;
 }
+
 interface IPianoContext {
     onSelect?: (selected: string) => void;
 }
@@ -15,7 +16,6 @@ export const PianoContext = createContext<IPianoContext>({});
 
 export const Piano: FC<BasePianoProps> = (props) => {
     const { className, onSelect, children } = props;
-    console.log(className);
     const classes = classNames(styles.piano, styles[className === undefined ? '' : className]);
     const handleClick = (index: string) => {
         if (onSelect) {

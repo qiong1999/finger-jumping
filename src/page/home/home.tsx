@@ -89,6 +89,9 @@ function Home() {
             tabIndex={-1}
             onKeyDown={(e) => {
                 handleSelect({ value: e.key });
+                setTimeout(() => {
+                    handleSelect({ value: '' });
+                }, 200);
             }}
         >
             <Piano

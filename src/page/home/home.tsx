@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
@@ -61,8 +61,11 @@ interface paramProps {
     value?: string;
     checked?: boolean;
 }
+
 function Home() {
     const [keyState, setKey] = useState(test);
+    // 新建一个数组 存储当前按下的所有按键
+    const [downKeys, setDownKeys] = useState<string[]>([]);
     const Lists = keyState.map((item, index) => {
         return <PianoItem keyValue={item} key={index}></PianoItem>;
     });
@@ -83,15 +86,41 @@ function Home() {
         setKey(temp);
     };
 
+    // 当按下一个key的时候，就把它加入到当前正处于按下状态的key数组
+    const handleKeyDown = (value: string) => {
+        setDownKeys([...new Set([...downKeys, value])]);
+    };
+
+    // 当抬起一个key的时候，就把它移出数组
+    const handleKeyUp = (value: string) => {
+        setDownKeys([...downKeys.filter((key) => key !== value)]);
+    };
+
+    // 监听downKeys数组，当数组发生变化（数组发生变化说明按键变化）的时候更新界面
+    useEffect(() => {
+        // 这里可以借用你写好的逻辑
+        let temp = keyState.map((item) => {
+            return item.map((itt) => {
+                itt.checked = false;
+                // 如果按下按键的数组中有当前遍历到的item的value
+                if (downKeys.includes(itt.value)) {
+                    itt.checked = true;
+                }
+                return itt;
+            });
+        });
+        setKey(temp);
+    }, [downKeys]);
+
     return (
         <div
             className={styles.container}
             tabIndex={-1}
             onKeyDown={(e) => {
-                handleSelect({ value: e.key });
-                setTimeout(() => {
-                    handleSelect({ value: '' });
-                }, 200);
+                handleKeyDown(e.key);
+            }}
+            onKeyUp={(e) => {
+                handleKeyUp(e.key);
             }}
         >
             <Piano

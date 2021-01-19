@@ -1,3 +1,6 @@
+* {
+    user-select: nonde;
+}
 button {
     border: none;
     outline: none;

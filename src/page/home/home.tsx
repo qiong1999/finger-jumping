@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
@@ -62,46 +62,83 @@ interface paramProps {
     checked?: boolean;
 }
 function Home() {
+    //存储钢琴信息
     const [keyState, setKey] = useState(test);
+    //存储鼠标是否按下
+    const [downKeys, setDownKeys] = useState<string[]>([]);
+    //存储鼠标当前在哪个key上，由于鼠标一次只能有一个key，所以只需存一次
+    const [mouseDown, setMouseDown] = useState<boolean>(false);
     const Lists = keyState.map((item, index) => {
         return <PianoItem keyValue={item} key={index}></PianoItem>;
     });
-    const handleSelect = (param: paramProps) => {
+
+    //当按下一个key的时候，就把它加入到当前正处于按下状态的key数组
+    const handleKeyDown = (value: string) => {
+        setDownKeys([...new Set([...downKeys, value])]);
+    };
+    //当抬起一个key的时候，就把它移出数组
+    const handleKeyUp = (value: string) => {
+        setDownKeys([...downKeys.filter((key) => key !== value)]);
+    };
+    useEffect(() => {
         let temp = keyState.map((item) => {
             return item.map((itt) => {
                 itt.checked = false;
-                if (itt.value === param.value) {
+                if (downKeys.includes(itt.value)) {
                     itt.checked = true;
-                    //1console.log('itt', itt);
-                }
-                if (itt.checked === true) {
-                    console.log(itt);
                 }
                 return itt;
             });
         });
         setKey(temp);
-    };
-
+    }, [downKeys]);
     return (
         <div
             className={styles.container}
             tabIndex={-1}
             onKeyDown={(e) => {
-                handleSelect({ value: e.key });
-                setTimeout(() => {
-                    handleSelect({ value: '' });
-                }, 200);
+                handleKeyDown(e.key);
+            }}
+            onKeyUp={(e) => {
+                handleKeyUp(e.key);
+            }}
+            onMouseDown={(e) => {
+                // 更新鼠标状态为按下
+                setMouseDown(true);
+
+                // 把当前按下的按键加入到数组中
+                // 通过e.target可以获取到当前鼠标在哪个键上
+                // ts不让获取target上的id，但其实上边有id，所以需要进行一下类型转换，先
+                // 转换为unknown 在转化为{id: string}，就可以拿到id了
+
+                const curId = ((e.target as unknown) as { id: string }).id;
+                console.log('mouseDown', curId);
+                // 如果当前元素没有id，就啥也不干
+                if (!curId) return;
+                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
+                // 把downKeys数组设置为只有当前鼠标按下的
+                setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
+            }}
+            onMouseUp={(e) => {
+                //更新鼠标状态为抬起
+                setMouseDown(false);
+                const curId = ((e.target as unknown) as { id: string }).id;
+                console.log('mouseUp', curId);
+                if (!curId) return;
+                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
+                // 把downKeys数组设置为只有当前鼠标按下的
+                setDownKeys([]);
+            }}
+            onMouseMove={(e) => {
+                //如果鼠标没有按下的话,什么都不做
+                if (!mouseDown) return;
+                const curId = ((e.target as unknown) as { id: string }).id;
+
+                if (!curId) return;
+                setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
         >
-            <Piano
-                onSelect={(e) => {
-                    handleSelect(JSON.parse(e));
-                }}
-            >
-                {Lists}
-            </Piano>
-            <Alert></Alert>
+            <Piano>{Lists}</Piano>
         </div>
     );
 }

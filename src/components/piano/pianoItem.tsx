@@ -28,18 +28,7 @@ export const PianoItem: FC<PianoItemProps> = (props) => {
     const wkList = pianoKeys.map((item, index) => {
         if (index < 7) {
             return (
-                <button
-                    id={item.id}
-                    key={item.id}
-                    className={`${styles.whiteKey} ${item.checked ? styles.wk : ''}`}
-                    onClick={() => {
-                        handleClick(JSON.stringify(item));
-
-                        setTimeout(() => {
-                            handleClick(JSON.stringify('{}'));
-                        }, 200);
-                    }}
-                >
+                <button id={item.id} key={item.id} className={`${styles.whiteKey} ${item.checked ? styles.wk : ''}`}>
                     {item.value}
                     <audio></audio>
                 </button>
@@ -49,17 +38,7 @@ export const PianoItem: FC<PianoItemProps> = (props) => {
     const bkListOne = pianoKeys.map((item, index) => {
         if (index >= 7 && index < 9) {
             return (
-                <button
-                    id={item.id}
-                    key={item.id}
-                    className={`${styles.blackKey} ${item.checked ? styles.bk : ''}`}
-                    onClick={() => {
-                        handleClick(JSON.stringify(item));
-                        setTimeout(() => {
-                            handleClick(JSON.stringify('{}'));
-                        }, 200);
-                    }}
-                >
+                <button id={item.id} key={item.id} className={`${styles.blackKey} ${item.checked ? styles.bk : ''}`}>
                     {item.value}
                     <audio></audio>
                 </button>
@@ -69,17 +48,7 @@ export const PianoItem: FC<PianoItemProps> = (props) => {
     const bkListTwo = pianoKeys.map((item, index) => {
         if (index >= 9) {
             return (
-                <button
-                    id={item.id}
-                    key={item.id}
-                    className={`${styles.blackKey} ${item.checked ? styles.bk : ''}`}
-                    onClick={() => {
-                        handleClick(JSON.stringify(item));
-                        setTimeout(() => {
-                            handleClick(JSON.stringify('{}'));
-                        }, 200);
-                    }}
-                >
+                <button id={item.id} key={item.id} className={`${styles.blackKey} ${item.checked ? styles.bk : ''}`}>
                     {item.value}
                     <audio></audio>
                 </button>

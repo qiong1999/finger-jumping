@@ -66,6 +66,9 @@ function Home() {
     const [keyState, setKey] = useState(test);
     // 新建一个数组 存储当前按下的所有按键
     const [downKeys, setDownKeys] = useState<string[]>([]);
+    // 新建一个状态 存储鼠标是否按下
+    const [mouseDown, setMouseDown] = useState<boolean>(false);
+    // 新建一个state，存储鼠标当前在哪个key上，因为鼠标一次只能有一个key，所以只需要存一次
     const Lists = keyState.map((item, index) => {
         return <PianoItem keyValue={item} key={index}></PianoItem>;
     });
@@ -121,6 +124,40 @@ function Home() {
             }}
             onKeyUp={(e) => {
                 handleKeyUp(e.key);
+            }}
+            onMouseDown={(e) => {
+                // 更新鼠标状态为按下
+                setMouseDown(true);
+                // 把当前按下的按键加入到数组中
+                // 通过e.target可以获取到当前鼠标在哪个键上
+                // ts不让获取target上的id，但其实上边有id，所以需要进行一下类型转换，先
+                // 转换为unknown 在转化为{id: string}，就可以拿到id了
+                const curId = ((e.target as unknown) as { id: string }).id;
+                // 如果当前元素没有id，就啥也不干
+                if (!curId) return;
+                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
+                // 把downKeys数组设置为只有当前鼠标按下的
+                setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
+            }}
+            onMouseUp={(e) => {
+                // 更新鼠标状态为抬起
+                setMouseDown(false);
+                const curId = ((e.target as unknown) as { id: string }).id;
+                // 如果当前元素没有id，就啥也不干
+                if (!curId) return;
+                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
+                // 把downKeys数组设置为只有当前鼠标按下的
+                setDownKeys([]);
+            }}
+            onMouseMove={(e) => {
+                // 如果鼠标没按下的话 return出去啥也不做
+                if (!mouseDown) return;
+                const curId = ((e.target as unknown) as { id: string }).id;
+                // 如果当前元素没有id，就啥也不干
+                if (!curId) return;
+                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
+                // 把downKeys数组设置为只有当前鼠标按下的
+                setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
         >
             <Piano

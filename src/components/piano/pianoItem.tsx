@@ -19,12 +19,6 @@ export const PianoItem: FC<PianoItemProps> = (props) => {
     const classes = classNames(styles.pianoItem, styles[className === undefined ? '' : className]);
     const context = useContext(PianoContext);
 
-    const handleClick = (index: string) => {
-        if (context.onSelect) {
-            context.onSelect(index);
-        }
-    };
-
     const wkList = pianoKeys.map((item, index) => {
         if (index < 7) {
             return (

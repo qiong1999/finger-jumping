@@ -26,37 +26,37 @@ const test = [
     ],
 
     [
-        { id: '13', value: 'q', checked: false },
-        { id: '14', value: 'w', checked: false },
-        { id: '15', value: 'e', checked: false },
-        { id: '16', value: 'r', checked: false },
-        { id: '17', value: 't', checked: false },
-        { id: '18', value: 'y', checked: false },
-        { id: '19', value: 'u', checked: false },
+        { id: '13', value: 'q', checked: false, chord: '' },
+        { id: '14', value: 'w', checked: false, chord: '' },
+        { id: '15', value: 'e', checked: false, chord: '' },
+        { id: '16', value: 'r', checked: false, chord: '' },
+        { id: '17', value: 't', checked: false, chord: '' },
+        { id: '18', value: 'y', checked: false, chord: '' },
+        { id: '19', value: 'u', checked: false, chord: '' },
 
-        { id: '21', value: 'i', checked: false },
-        { id: '22', value: 'o', checked: false },
+        { id: '21', value: 'i', checked: false, chord: '' },
+        { id: '22', value: 'o', checked: false, chord: '' },
 
-        { id: '23', value: 'p', checked: false },
-        { id: '24', value: 'a', checked: false },
-        { id: '25', value: 's', checked: false },
+        { id: '23', value: 'p', checked: false, chord: '' },
+        { id: '24', value: 'a', checked: false, chord: '' },
+        { id: '25', value: 's', checked: false, chord: '' },
     ],
 
     [
-        { id: '26', value: 'd', checked: false },
-        { id: '27', value: 'f', checked: false },
-        { id: '28', value: 'g', checked: false },
-        { id: '29', value: 'h', checked: false },
-        { id: '30', value: 'j', checked: false },
-        { id: '31', value: 'k', checked: false },
-        { id: '32', value: 'l', checked: false },
+        { id: '26', value: 'd', checked: false, chord: '' },
+        { id: '27', value: 'f', checked: false, chord: '' },
+        { id: '28', value: 'g', checked: false, chord: '' },
+        { id: '29', value: 'h', checked: false, chord: '' },
+        { id: '30', value: 'j', checked: false, chord: '' },
+        { id: '31', value: 'k', checked: false, chord: '' },
+        { id: '32', value: 'l', checked: false, chord: '' },
 
-        { id: '33', value: 'z', checked: true },
-        { id: '34', value: 'x', checked: false },
+        { id: '33', value: 'z', checked: true, chord: '' },
+        { id: '34', value: 'x', checked: false, chord: '' },
 
-        { id: '35', value: 'c', checked: false },
-        { id: '46', value: 'v', checked: false },
-        { id: '37', value: 'b', checked: false },
+        { id: '35', value: 'c', checked: false, chord: '' },
+        { id: '46', value: 'v', checked: false, chord: '' },
+        { id: '37', value: 'b', checked: false, chord: '' },
     ],
 ];
 
@@ -79,7 +79,6 @@ function Home() {
     const [downKeys, setDownKeys] = useState<string[]>([]);
     // 新建一个状态 存储鼠标是否按下
     const [mouseDown, setMouseDown] = useState<boolean>(false);
-    // 新建一个state，存储鼠标当前在哪个key上，因为鼠标一次只能有一个key，所以只需要存一次
     const Lists = keyState.map((item, index) => {
         return <PianoItem keyValue={item} key={index}></PianoItem>;
     });
@@ -126,12 +125,26 @@ function Home() {
         setKey(temp);
     }, [downKeys]);
 
+    const playKey = (musicKey: string) => {
+        if (musicKey) {
+            let curMusicChord = test.flat(3).find((item) => item.id === musicKey)?.chord;
+            // 如果chord找到了
+            if (curMusicChord) {
+                // 将audio的进度重置为0
+                chord_music[curMusicChord].currentTime = 0;
+                chord_music[curMusicChord].play();
+                console.log();
+            }
+        }
+    };
+
     return (
         <div
             className={styles.container}
             tabIndex={-1}
             onKeyDown={(e) => {
                 handleKeyDown(e.key);
+                playKey(e.key);
             }}
             onKeyUp={(e) => {
                 handleKeyUp(e.key);
@@ -148,6 +161,7 @@ function Home() {
                 if (!curId) return;
                 // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
                 // 把downKeys数组设置为只有当前鼠标按下的
+                playKey(curId);
                 setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
             onMouseUp={(e) => {
@@ -166,6 +180,7 @@ function Home() {
                 const curId = ((e.target as unknown) as { id: string }).id;
                 // 如果当前元素没有id，就啥也不干
                 if (!curId) return;
+                playKey(curId);
                 // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
                 // 把downKeys数组设置为只有当前鼠标按下的
                 setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);

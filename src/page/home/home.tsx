@@ -2,65 +2,67 @@ import React, { useState, useEffect } from 'react';
 import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
+import { chords } from '../../piano_chords';
 
 import styles from './home.module.css';
 const test = [
     [
-        { id: '1', value: '1', checked: false },
-        { id: '2', value: '2', checked: false },
-        { id: '3', value: '3', checked: false },
-        { id: '4', value: '4', checked: false },
-        { id: '5', value: '5', checked: false },
-        { id: '6', value: '6', checked: false },
-        { id: '7', value: '7', checked: false },
+        { id: '1', value: '1', checked: false, chord: 'C1' },
+        { id: '2', value: '2', checked: false, chord: 'D1' },
+        { id: '3', value: '3', checked: false, chord: 'E1' },
+        { id: '4', value: '4', checked: false, chord: 'F1' },
+        { id: '5', value: '5', checked: false, chord: 'G1' },
+        { id: '6', value: '6', checked: false, chord: 'A1' },
+        { id: '7', value: '7', checked: false, chord: 'B1' },
 
-        { id: '8', value: '8', checked: false },
-        { id: '9', value: '9', checked: false },
+        { id: '8', value: '8', checked: false, chord: 'Db1' },
+        { id: '9', value: '9', checked: false, chord: 'Eb1' },
 
-        { id: '10', value: '0', checked: false },
-        { id: '11', value: 'n', checked: false },
-        { id: '12', value: 'm', checked: false },
+        { id: '10', value: '0', checked: false, chord: 'Gb1' },
+        { id: '11', value: 'n', checked: false, chord: 'Ab1' },
+        { id: '12', value: 'm', checked: false, chord: 'Bb1' },
     ],
 
     [
-        { id: '13', value: 'q', checked: false },
-        { id: '14', value: 'w', checked: false },
-        { id: '15', value: 'e', checked: false },
-        { id: '16', value: 'r', checked: false },
-        { id: '17', value: 't', checked: false },
-        { id: '18', value: 'y', checked: false },
-        { id: '19', value: 'u', checked: false },
+        { id: '13', value: 'q', checked: false, chord: 'E1' },
+        { id: '14', value: 'w', checked: false, chord: 'E1' },
+        { id: '15', value: 'e', checked: false, chord: 'E1' },
+        { id: '16', value: 'r', checked: false, chord: 'E1' },
+        { id: '17', value: 't', checked: false, chord: 'E1' },
+        { id: '18', value: 'y', checked: false, chord: 'E1' },
+        { id: '19', value: 'u', checked: false, chord: 'E1' },
 
-        { id: '21', value: 'i', checked: false },
-        { id: '22', value: 'o', checked: false },
+        { id: '21', value: 'i', checked: false, chord: 'E1' },
+        { id: '22', value: 'o', checked: false, chord: 'E1' },
 
-        { id: '23', value: 'p', checked: false },
-        { id: '24', value: 'a', checked: false },
-        { id: '25', value: 's', checked: false },
+        { id: '23', value: 'p', checked: false, chord: 'E1' },
+        { id: '24', value: 'a', checked: false, chord: 'E1' },
+        { id: '25', value: 's', checked: false, chord: 'E1' },
     ],
 
     [
-        { id: '26', value: 'd', checked: false },
-        { id: '27', value: 'f', checked: false },
-        { id: '28', value: 'g', checked: false },
-        { id: '29', value: 'h', checked: false },
-        { id: '30', value: 'j', checked: false },
-        { id: '31', value: 'k', checked: false },
-        { id: '32', value: 'l', checked: false },
+        { id: '26', value: 'd', checked: false, chord: 'E1' },
+        { id: '27', value: 'f', checked: false, chord: 'E1' },
+        { id: '28', value: 'g', checked: false, chord: 'E1' },
+        { id: '29', value: 'h', checked: false, chord: 'E1' },
+        { id: '30', value: 'j', checked: false, chord: 'E1' },
+        { id: '31', value: 'k', checked: false, chord: 'E1' },
+        { id: '32', value: 'l', checked: false, chord: 'E1' },
 
-        { id: '33', value: 'z', checked: true },
-        { id: '34', value: 'x', checked: false },
+        { id: '33', value: 'z', checked: true, chord: 'E1' },
+        { id: '34', value: 'x', checked: false, chord: 'E1' },
 
-        { id: '35', value: 'c', checked: false },
-        { id: '46', value: 'v', checked: false },
-        { id: '37', value: 'b', checked: false },
+        { id: '35', value: 'c', checked: false, chord: 'E1' },
+        { id: '46', value: 'v', checked: false, chord: 'E1' },
+        { id: '37', value: 'b', checked: false, chord: 'E1' },
     ],
 ];
-interface paramProps {
-    id?: string;
-    value?: string;
-    checked?: boolean;
-}
+//把chord 中所有的base64转换为Audio 对象
+const chord_music = Object.entries(chords).reduce((prev: Record<string, HTMLAudioElement>, curPair) => {
+    prev[curPair[0]] = new Audio(curPair[1]);
+    return prev;
+}, {});
+
 function Home() {
     //存储钢琴信息
     const [keyState, setKey] = useState(test);
@@ -92,12 +94,25 @@ function Home() {
         });
         setKey(temp);
     }, [downKeys]);
+
+    const playKey = (musicKey: string) => {
+        if (musicKey) {
+            let curMusicChord = test.flat(3).find((item) => item.id === musicKey || item.value === musicKey)?.chord;
+            //如果chord找到了
+            if (curMusicChord) {
+                //将audio的进度重置为
+                chord_music[curMusicChord].currentTime = 0;
+                chord_music[curMusicChord].play();
+            }
+        }
+    };
     return (
         <div
             className={styles.container}
             tabIndex={-1}
             onKeyDown={(e) => {
                 handleKeyDown(e.key);
+                playKey(e.key);
             }}
             onKeyUp={(e) => {
                 handleKeyUp(e.key);
@@ -117,6 +132,7 @@ function Home() {
                 if (!curId) return;
                 // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
                 // 把downKeys数组设置为只有当前鼠标按下的
+                playKey(curId);
                 setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
             onMouseUp={(e) => {
@@ -135,6 +151,7 @@ function Home() {
                 const curId = ((e.target as unknown) as { id: string }).id;
 
                 if (!curId) return;
+                playKey(curId);
                 setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
         >

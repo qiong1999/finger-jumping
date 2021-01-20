@@ -1,3 +1,6 @@
+* {
+    user-select: none;
+}
 .container {
     position: relative;
     width: 100vw;

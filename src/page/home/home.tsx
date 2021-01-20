@@ -2,24 +2,27 @@ import React, { useEffect, useState } from 'react';
 import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
+// 导入音频的base64
+import { chords } from './piano_chords';
 
 import styles from './home.module.css';
+// 给每个健绑定上chord属性，从c1开始
 const test = [
     [
-        { id: '1', value: '1', checked: false },
-        { id: '2', value: '2', checked: false },
-        { id: '3', value: '3', checked: false },
-        { id: '4', value: '4', checked: false },
-        { id: '5', value: '5', checked: false },
-        { id: '6', value: '6', checked: false },
-        { id: '7', value: '7', checked: false },
+        { id: '1', value: '1', checked: false, chord: 'C1' },
+        { id: '2', value: '2', checked: false, chord: 'D1' },
+        { id: '3', value: '3', checked: false, chord: 'E1' },
+        { id: '4', value: '4', checked: false, chord: 'F1' },
+        { id: '5', value: '5', checked: false, chord: 'G1' },
+        { id: '6', value: '6', checked: false, chord: 'A1' },
+        { id: '7', value: '7', checked: false, chord: 'B1' },
 
-        { id: '8', value: '8', checked: false },
-        { id: '9', value: '9', checked: false },
+        { id: '8', value: '8', checked: false, chord: 'Db1' },
+        { id: '9', value: '9', checked: false, chord: 'Eb1' },
 
-        { id: '10', value: '0', checked: false },
-        { id: '11', value: 'n', checked: false },
-        { id: '12', value: 'm', checked: false },
+        { id: '10', value: '0', checked: false, chord: 'Gb1' },
+        { id: '11', value: 'n', checked: false, chord: 'Ab1' },
+        { id: '12', value: 'm', checked: false, chord: 'Bb1' },
     ],
 
     [
@@ -56,6 +59,14 @@ const test = [
         { id: '37', value: 'b', checked: false },
     ],
 ];
+
+// 把chord中所有的base64转换为Audio对象
+const chord_music = Object.entries(chords).reduce((prev: Record<string, HTMLAudioElement>, curPair) => {
+    prev[curPair[0]] = new Audio(curPair[1]);
+    return prev;
+}, {});
+
+console.log(chord_music);
 interface paramProps {
     id?: string;
     value?: string;

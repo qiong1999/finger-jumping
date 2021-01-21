@@ -74,6 +74,9 @@ const chord_music = Object.entries(chords).reduce((prev: Record<string, HTMLAudi
     return prev;
 }, {});
 
+// 声明一下画布移动的速度
+const speed = 5;
+
 console.log(chord_music);
 interface paramProps {
     id?: string;
@@ -122,20 +125,28 @@ function Home() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const drawChords = () => {
+        // 把当前正在处于按下状态的按键数组转换为案件对应的dom的clientRect的数组
         const keyDoms = realTimeChords.current.map((value) => {
             const id = v2i[value];
             const curDom = document.getElementById(id);
             const rect = curDom?.getClientRects()[0];
             return rect;
         });
-        // console.log('🎹', realTimeChords.current, JSON.stringify(keyDoms));
-        const ctx = canvasRef.current?.getContext('2d');
-        if (ctx) {
+
+        if (canvasRef.current) {
+            const ctx: CanvasRenderingContext2D = canvasRef.current.getContext('2d') as CanvasRenderingContext2D;
+            // 把已经画过的内容向上移动{speed}px
+            // 先把当前画布的图像存起来
+            let snapshot = ctx.getImageData(0, 0, window.innerWidth, window.innerHeight);
+            // 清空当前画布
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            // 再把存起来的图像放回画布，不过要向上移动{speed}px
+            ctx.putImageData(snapshot, 0, -speed);
             for (let dom of keyDoms) {
                 if (dom) {
                     ctx.beginPath();
-                    ctx.rect(dom?.left, 0, dom?.width, window.innerHeight);
+                    ctx.rect(dom?.left, dom.top - speed, dom?.width, 10);
+                    ctx.fillStyle = 'pink';
                     ctx.fill();
                     ctx.closePath();
                 }

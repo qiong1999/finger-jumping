@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
 import { chords } from '../../piano_chords';
+import PaintNode from '../../canvas';
 
 import styles from './home.module.css';
 const test = [
@@ -82,6 +83,18 @@ function Home() {
     const handleKeyUp = (value: string) => {
         setDownKeys([...downKeys.filter((key) => key !== value)]);
     };
+    const playKey = (musicKey: string) => {
+        if (musicKey) {
+            let curMusicChord = test.flat(3).find((item) => item.id === musicKey || item.value === musicKey)?.chord;
+            //如果chord找到了
+            if (curMusicChord) {
+                //将audio的进度重置为
+                chord_music[curMusicChord].currentTime = 0;
+                chord_music[curMusicChord].play();
+            }
+        }
+    };
+
     useEffect(() => {
         let temp = keyState.map((item) => {
             return item.map((itt) => {
@@ -95,21 +108,9 @@ function Home() {
         setKey(temp);
     }, [downKeys]);
 
-    const playKey = (musicKey: string) => {
-        if (musicKey) {
-            let curMusicChord = test.flat(3).find((item) => item.id === musicKey || item.value === musicKey)?.chord;
-            //如果chord找到了
-            if (curMusicChord) {
-                //将audio的进度重置为
-                chord_music[curMusicChord].currentTime = 0;
-                chord_music[curMusicChord].play();
-            }
-        }
-    };
     return (
         <div
             className={styles.container}
-            tabIndex={-1}
             onKeyDown={(e) => {
                 handleKeyDown(e.key);
                 playKey(e.key);
@@ -155,7 +156,9 @@ function Home() {
                 setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
         >
-            <Piano>{Lists}</Piano>
+            <div className={styles.footer}>
+                <Piano>{Lists}</Piano>
+            </div>
         </div>
     );
 }

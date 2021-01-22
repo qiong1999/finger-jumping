@@ -69,7 +69,7 @@ const chord_music = Object.entries(chords).reduce((prev: Record<string, HTMLAudi
     return prev;
 }, {});
 //声明画布移动的速度
-const speed = 5;
+const speed = 3;
 function Home() {
     //存储钢琴信息
     const [keyState, setKey] = useState(test);
@@ -99,30 +99,37 @@ function Home() {
             const id = vtoi[value];
             const curDom = document.getElementById(id);
             const rect = curDom?.getClientRects()[0];
-            console.log(rect);
+            //  console.log(rect);
             return rect;
         });
         //console.log('执行了，', keyDoms);
         if (canvasRef.current) {
             const ctx: CanvasRenderingContext2D = canvasRef.current.getContext('2d') as CanvasRenderingContext2D;
+
             //把画过的内容向上移动{speed}px;
             //先将当前画布图像存起来
             let snapshot = ctx.getImageData(0, 0, window.innerWidth, window.innerHeight);
             //清空当前画布
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
             //再把存起来的画像放回画布，再向上移动{speed}
-            ctx.putImageData(snapshot, 0, -speed);
-            for (let dom of keyDoms) {
-                if (dom) {
-                    console.log('开始', dom);
-                    ctx.beginPath();
-                    ctx.rect(dom?.left, dom.top - speed, dom?.width, 10);
-                    ctx.fillStyle = 'pink';
-                    ctx.fill();
-                    ctx.closePath();
+
+            const img = new Image();
+            img.onload = function () {
+                for (let dom of keyDoms) {
+                    if (dom) {
+                        ctx.beginPath();
+                        ctx.rect(dom?.left, dom.top - speed, dom?.width, 70);
+                        ctx.fillStyle = 'pink';
+                        ctx.fill();
+                        ctx.closePath();
+                        ctx.drawImage(img, dom?.left, dom.top + 20, 21, 50);
+                    }
                 }
-            }
+            };
+            img.src = 'ic.png';
+            ctx.putImageData(snapshot, 10 * Math.random(), -speed);
         }
+
         requestAnimationFrame(drawChords);
     };
     const playKey = (musicKey: string) => {

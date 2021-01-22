@@ -1,17 +1,13 @@
 * {
     user-select: none;
 }
-.container {
+.container:webkit-scrollbar {
+    display: none;
 }
-
-.ic {
-    display: inline-block;
-    width: 41px;
-    height: 41px;
-    background-image: url('ic.png');
-    background-size: 30px;
-    background-repeat: no-repeat;
-    background-position: center;
+.container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
 }
 
 .footer {

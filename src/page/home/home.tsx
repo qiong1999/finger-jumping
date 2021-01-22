@@ -3,7 +3,6 @@ import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
 import { chords } from '../../piano_chords';
-import PaintNode from '../../canvas';
 
 import styles from './home.module.css';
 const test = [
@@ -58,12 +57,19 @@ const test = [
         { id: '37', value: 'b', checked: false, chord: 'E1' },
     ],
 ];
+//建立一个value到id 的map
+const vtoi = test.flat(3).reduce((acc: Record<string, string>, cur) => {
+    acc[cur.value] = cur.id;
+    return acc;
+}, {});
+//console.log(vtoi);
 //把chord 中所有的base64转换为Audio 对象
 const chord_music = Object.entries(chords).reduce((prev: Record<string, HTMLAudioElement>, curPair) => {
     prev[curPair[0]] = new Audio(curPair[1]);
     return prev;
 }, {});
-
+//声明画布移动的速度
+const speed = 5;
 function Home() {
     //存储钢琴信息
     const [keyState, setKey] = useState(test);
@@ -83,6 +89,42 @@ function Home() {
     const handleKeyUp = (value: string) => {
         setDownKeys([...downKeys.filter((key) => key !== value)]);
     };
+    const realTimeChords = useRef<string[]>([]);
+    //创建ref 用于绑定canvas
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const drawChords = () => {
+        //把当前正处于按下状态的按键数组转换为案件对应的dom的clientRect的数组
+        //console.log(realTimeChords, 'realTimeChords');
+        const keyDoms = realTimeChords.current.map((value) => {
+            const id = vtoi[value];
+            const curDom = document.getElementById(id);
+            const rect = curDom?.getClientRects()[0];
+            console.log(rect);
+            return rect;
+        });
+        //console.log('执行了，', keyDoms);
+        if (canvasRef.current) {
+            const ctx: CanvasRenderingContext2D = canvasRef.current.getContext('2d') as CanvasRenderingContext2D;
+            //把画过的内容向上移动{speed}px;
+            //先将当前画布图像存起来
+            let snapshot = ctx.getImageData(0, 0, window.innerWidth, window.innerHeight);
+            //清空当前画布
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            //再把存起来的画像放回画布，再向上移动{speed}
+            ctx.putImageData(snapshot, 0, -speed);
+            for (let dom of keyDoms) {
+                if (dom) {
+                    console.log('开始', dom);
+                    ctx.beginPath();
+                    ctx.rect(dom?.left, dom.top - speed, dom?.width, 10);
+                    ctx.fillStyle = 'pink';
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+        }
+        requestAnimationFrame(drawChords);
+    };
     const playKey = (musicKey: string) => {
         if (musicKey) {
             let curMusicChord = test.flat(3).find((item) => item.id === musicKey || item.value === musicKey)?.chord;
@@ -94,8 +136,21 @@ function Home() {
             }
         }
     };
-
     useEffect(() => {
+        drawChords();
+        if (canvasRef.current) {
+            canvasRef.current.width = window.innerWidth;
+            canvasRef.current.height = window.innerHeight;
+        }
+        window.addEventListener('resize', () => {
+            if (canvasRef.current) {
+                canvasRef.current.width = window.innerWidth;
+                canvasRef.current.height = window.innerHeight;
+            }
+        });
+    }, []);
+    useEffect(() => {
+        // drawChords();
         let temp = keyState.map((item) => {
             return item.map((itt) => {
                 itt.checked = false;
@@ -106,6 +161,7 @@ function Home() {
             });
         });
         setKey(temp);
+        realTimeChords.current = [...downKeys];
     }, [downKeys]);
 
     return (
@@ -159,6 +215,8 @@ function Home() {
             <div className={styles.footer}>
                 <Piano>{Lists}</Piano>
             </div>
+            {}
+            <canvas ref={canvasRef} style={{ backgroundColor: 'white', width: '100%', height: '100%' }}></canvas>
         </div>
     );
 }

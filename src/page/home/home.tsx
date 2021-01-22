@@ -77,6 +77,9 @@ function Home() {
     const [downKeys, setDownKeys] = useState<string[]>([]);
     //存储鼠标当前在哪个key上，由于鼠标一次只能有一个key，所以只需存一次
     const [mouseDown, setMouseDown] = useState<boolean>(false);
+    const [altTop, setTop] = useState(0);
+    const [altLeft, setLeft] = useState(0);
+    const [display, setDisplay] = useState('none');
     const Lists = keyState.map((item, index) => {
         return <PianoItem keyValue={item} key={index}></PianoItem>;
     });
@@ -134,7 +137,7 @@ function Home() {
     };
     const playKey = (musicKey: string) => {
         if (musicKey) {
-            let curMusicChord = test.flat(3).find((item) => item.id === musicKey || item.value === musicKey)?.chord;
+            let curMusicChord = test.flat(3).find((item) => item.value === musicKey)?.chord;
             //如果chord找到了
             if (curMusicChord) {
                 //将audio的进度重置为
@@ -142,6 +145,19 @@ function Home() {
                 chord_music[curMusicChord].play();
             }
         }
+    };
+    const changeKey = (e: { chord: string; value: string }) => {
+        let tempKeys = keyState.map((item) => {
+            item.map((itt) => {
+                if (itt.value === e.value) {
+                    itt.chord = e.chord;
+                    console.log(itt);
+                }
+                return itt;
+            });
+            return item;
+        });
+        setKey(tempKeys);
     };
     useEffect(() => {
         drawChords();
@@ -154,6 +170,28 @@ function Home() {
                 canvasRef.current.width = window.innerWidth;
                 canvasRef.current.height = window.innerHeight;
             }
+        });
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const clickX = e.clientX;
+            const clickY = e.clientY;
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            const rootW = 228;
+            const rootH = 159;
+            const right = screenW - clickX > rootW;
+            const bottom = screenH - clickY > rootH;
+            if (right) {
+                setLeft(clickX);
+            } else {
+                setLeft(clickX - rootW);
+            }
+            if (bottom) {
+                setTop(clickY);
+            } else {
+                setTop(clickY - rootH);
+            }
+            setDisplay('block');
         });
     }, []);
     useEffect(() => {
@@ -219,11 +257,34 @@ function Home() {
                 setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
         >
-            <div className={styles.footer}>
+            <Alert
+                className="alert"
+                ownStyle={{ position: 'absolute', display: display, left: altLeft, top: altTop }}
+                handleClick={(e: string) => {
+                    setDisplay(e);
+                }}
+                submit={(e: { chord: string; value: string }) => {
+                    console.log(e);
+                    changeKey(e);
+                }}
+                message={{ chords: ['C1', 'A1'] }}
+            ></Alert>
+            <div
+                className={styles.footer}
+                onClick={() => {
+                    setDisplay('none');
+                }}
+            >
                 <Piano>{Lists}</Piano>
             </div>
-            {}
-            <canvas ref={canvasRef} style={{ backgroundColor: 'white', width: '100%', height: '100%' }}></canvas>
+
+            <canvas
+                ref={canvasRef}
+                style={{ backgroundColor: 'white', width: '100%', height: '100%' }}
+                onClick={() => {
+                    setDisplay('none');
+                }}
+            ></canvas>
         </div>
     );
 }

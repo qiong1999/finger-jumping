@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import styles from './pianoItem.module.css';
 
-type keyValue = { id: string; value: string; checked: boolean }[];
+type keyValue = { id: string; value: string; checked: boolean; chord: string }[];
 
 export interface PianoItemProps {
     className?: string;
@@ -20,7 +20,7 @@ export const PianoItem: FC<PianoItemProps> = (props) => {
         if (index < 7) {
             return (
                 <button id={item.id} key={item.id} className={`${styles.whiteKey} ${item.checked ? styles.wk : ''}`}>
-                    {item.value}
+                    {item.value}-{item.chord}
                     <audio></audio>
                 </button>
             );
@@ -30,7 +30,7 @@ export const PianoItem: FC<PianoItemProps> = (props) => {
         if (index >= 7 && index < 9) {
             return (
                 <button id={item.id} key={item.id} className={`${styles.blackKey} ${item.checked ? styles.bk : ''}`}>
-                    {item.value}
+                    {item.value}-{item.chord}
                     <audio></audio>
                 </button>
             );
@@ -40,7 +40,7 @@ export const PianoItem: FC<PianoItemProps> = (props) => {
         if (index >= 9) {
             return (
                 <button id={item.id} key={item.id} className={`${styles.blackKey} ${item.checked ? styles.bk : ''}`}>
-                    {item.value}
+                    {item.value}-{item.chord}
                     <audio></audio>
                 </button>
             );

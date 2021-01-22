@@ -12,9 +12,11 @@ button {
 .pianoItem {
     display: inline-block;
     position: relative;
+    vertical-align: top;
 }
 .whiteKey {
     display: inline-block;
+    vertical-align: top;
     width: 41px;
     min-height: 200px;
     padding-top: 160px;
@@ -31,6 +33,7 @@ button {
     width: 287px;
 }
 .blackKey {
+    vertical-align: top;
     display: inline-block;
     background-color: black;
     width: 27px;

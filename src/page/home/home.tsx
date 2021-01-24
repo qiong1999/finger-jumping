@@ -9,20 +9,20 @@ import * as Tone from 'tone';
 import styles from './home.module.css';
 const test = [
     [
-        { id: '1', value: '1', checked: false, chord: 'C1' },
-        { id: '2', value: '2', checked: false, chord: 'D1' },
-        { id: '3', value: '3', checked: false, chord: 'E1' },
-        { id: '4', value: '4', checked: false, chord: 'F1' },
-        { id: '5', value: '5', checked: false, chord: 'G1' },
-        { id: '6', value: '6', checked: false, chord: 'A1' },
-        { id: '7', value: '7', checked: false, chord: 'B1' },
+        { id: '1', value: '1', checked: false, chord: 'C4' },
+        { id: '2', value: '2', checked: false, chord: 'D4' },
+        { id: '3', value: '3', checked: false, chord: 'E4' },
+        { id: '4', value: '4', checked: false, chord: 'F4' },
+        { id: '5', value: '5', checked: false, chord: 'G4' },
+        { id: '6', value: '6', checked: false, chord: 'A4' },
+        { id: '7', value: '7', checked: false, chord: 'B4' },
 
-        { id: '8', value: '8', checked: false, chord: 'Db1' },
-        { id: '9', value: '9', checked: false, chord: 'Eb1' },
+        { id: '8', value: '8', checked: false, chord: 'Db4' },
+        { id: '9', value: '9', checked: false, chord: 'Eb4' },
 
-        { id: '10', value: '0', checked: false, chord: 'Gb1' },
-        { id: '11', value: 'n', checked: false, chord: 'Ab1' },
-        { id: '12', value: 'm', checked: false, chord: 'Bb1' },
+        { id: '10', value: '0', checked: false, chord: 'Gb4' },
+        { id: '11', value: 'n', checked: false, chord: 'Ab4' },
+        { id: '12', value: 'm', checked: false, chord: 'Bb4' },
     ],
 
     [
@@ -176,8 +176,9 @@ function Home() {
             if (curMusicChord) {
                 // 新建一个音符然后播放它
                 const synth = new Tone.Synth().toDestination();
-
-                synth.triggerAttackRelease('C4', '8n');
+                // 第一个参数是当前音符 例如 C4 D4 E4
+                // 第二个参数是持续时间 前边的数字越大，持续时间越短
+                synth.triggerAttackRelease(curMusicChord, '2n');
             }
         }
     };

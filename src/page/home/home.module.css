@@ -13,7 +13,7 @@
 .footer {
     position: absolute;
     bottom: 15px;
-    min-width: 865px;
+    min-width: 1150px;
 
     left: 50%;
     transform: translateX(-50%);

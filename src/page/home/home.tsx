@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import * as Tone from 'tone';
 import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
@@ -7,54 +8,66 @@ import { chords } from '../../piano_chords';
 import styles from './home.module.css';
 const test = [
     [
-        { id: '1', value: '1', checked: false, chord: 'C1' },
-        { id: '2', value: '2', checked: false, chord: 'D1' },
-        { id: '3', value: '3', checked: false, chord: 'E1' },
-        { id: '4', value: '4', checked: false, chord: 'F1' },
-        { id: '5', value: '5', checked: false, chord: 'G1' },
-        { id: '6', value: '6', checked: false, chord: 'A1' },
-        { id: '7', value: '7', checked: false, chord: 'B1' },
+        { id: '1113', value: 'A', checked: false, chord: 'C2' },
+        { id: '1114', value: 'B', checked: false, chord: 'D2' },
+        { id: '1115', value: 'C', checked: false, chord: 'E2' },
+        { id: '1116', value: 'D', checked: false, chord: 'F2' },
+        { id: '1117', value: 'E', checked: false, chord: 'G2' },
+        { id: '1118', value: 'F', checked: false, chord: 'A2' },
+        { id: '1119', value: 'G', checked: false, chord: 'B2' },
+        { id: '2111', value: 'H', checked: false, chord: 'Db1' },
+        { id: '2112', value: 'I', checked: false, chord: 'Eb2' },
 
-        { id: '8', value: '8', checked: false, chord: 'Db1' },
-        { id: '9', value: '9', checked: false, chord: 'Eb1' },
-
-        { id: '10', value: '0', checked: false, chord: 'Gb1' },
-        { id: '11', value: 'n', checked: false, chord: 'Ab1' },
-        { id: '12', value: 'm', checked: false, chord: 'Bb1' },
+        { id: '2113', value: 'O', checked: false, chord: 'Gb2' },
+        { id: '2114', value: 'U', checked: false, chord: 'Ab2' },
+        { id: '2115', value: 'F', checked: false, chord: 'Bb2' },
     ],
-
     [
-        { id: '13', value: 'q', checked: false, chord: 'E1' },
-        { id: '14', value: 'w', checked: false, chord: 'E1' },
-        { id: '15', value: 'e', checked: false, chord: 'E1' },
-        { id: '16', value: 'r', checked: false, chord: 'E1' },
-        { id: '17', value: 't', checked: false, chord: 'E1' },
-        { id: '18', value: 'y', checked: false, chord: 'E1' },
-        { id: '19', value: 'u', checked: false, chord: 'E1' },
+        { id: '13', value: 'q', checked: false, chord: 'C3' },
+        { id: '14', value: 'w', checked: false, chord: 'D3' },
+        { id: '15', value: 'e', checked: false, chord: 'E3' },
+        { id: '16', value: 'r', checked: false, chord: 'F3' },
+        { id: '17', value: 't', checked: false, chord: 'G3' },
+        { id: '18', value: 'y', checked: false, chord: 'A3' },
+        { id: '19', value: 'u', checked: false, chord: 'B3' },
+        { id: '21', value: 'i', checked: false, chord: 'Db3' },
+        { id: '22', value: 'o', checked: false, chord: 'Eb3' },
 
-        { id: '21', value: 'i', checked: false, chord: 'E1' },
-        { id: '22', value: 'o', checked: false, chord: 'E1' },
-
-        { id: '23', value: 'p', checked: false, chord: 'E1' },
-        { id: '24', value: 'a', checked: false, chord: 'E1' },
-        { id: '25', value: 's', checked: false, chord: 'E1' },
+        { id: '23', value: 'p', checked: false, chord: 'Gb2' },
+        { id: '24', value: 'a', checked: false, chord: 'Ab3' },
+        { id: '25', value: 's', checked: false, chord: 'Bb3' },
     ],
-
     [
-        { id: '26', value: 'd', checked: false, chord: 'E1' },
-        { id: '27', value: 'f', checked: false, chord: 'E1' },
-        { id: '28', value: 'g', checked: false, chord: 'E1' },
-        { id: '29', value: 'h', checked: false, chord: 'E1' },
-        { id: '30', value: 'j', checked: false, chord: 'E1' },
-        { id: '31', value: 'k', checked: false, chord: 'E1' },
-        { id: '32', value: 'l', checked: false, chord: 'E1' },
+        { id: '1', value: '1', checked: false, chord: 'C4' },
+        { id: '2', value: '2', checked: false, chord: 'D4' },
+        { id: '3', value: '3', checked: false, chord: 'E4' },
+        { id: '4', value: '4', checked: false, chord: 'F4' },
+        { id: '5', value: '5', checked: false, chord: 'G4' },
+        { id: '6', value: '6', checked: false, chord: 'A4' },
+        { id: '7', value: '7', checked: false, chord: 'B4' },
 
-        { id: '33', value: 'z', checked: true, chord: 'E1' },
-        { id: '34', value: 'x', checked: false, chord: 'E1' },
+        { id: '8', value: '8', checked: false, chord: 'Db4' },
+        { id: '9', value: '9', checked: false, chord: 'Eb4' },
 
-        { id: '35', value: 'c', checked: false, chord: 'E1' },
-        { id: '46', value: 'v', checked: false, chord: 'E1' },
-        { id: '37', value: 'b', checked: false, chord: 'E1' },
+        { id: '10', value: '0', checked: false, chord: 'Gb4' },
+        { id: '11', value: 'n', checked: false, chord: 'Ab4' },
+        { id: '12', value: 'm', checked: false, chord: 'Bb4' },
+    ],
+    [
+        { id: '111', value: '@', checked: false, chord: 'C5' },
+        { id: '112', value: '#', checked: false, chord: 'D5' },
+        { id: '113', value: '$', checked: false, chord: 'E5' },
+        { id: '114', value: '%', checked: false, chord: 'F5' },
+        { id: '115', value: '^', checked: false, chord: 'G5' },
+        { id: '116', value: '&', checked: false, chord: 'A5' },
+        { id: '117', value: '*', checked: false, chord: 'B5' },
+
+        { id: '118', value: '(', checked: false, chord: 'Db5' },
+        { id: '119', value: ')', checked: false, chord: 'Eb5' },
+
+        { id: '1110', value: '_', checked: false, chord: 'Gb5' },
+        { id: '1111', value: '+', checked: false, chord: 'Ab5' },
+        { id: '1112', value: '?', checked: false, chord: 'Bb5' },
     ],
 ];
 //建立一个value到id 的map
@@ -141,8 +154,9 @@ function Home() {
             //如果chord找到了
             if (curMusicChord) {
                 //将audio的进度重置为
-                chord_music[curMusicChord].currentTime = 0;
-                chord_music[curMusicChord].play();
+                const synth = new Tone.Synth().toDestination();
+                const now = Tone.now();
+                synth.triggerAttackRelease(curMusicChord, '2n');
             }
         }
     };
@@ -229,22 +243,19 @@ function Home() {
                 // 转换为unknown 在转化为{id: string}，就可以拿到id了
 
                 const curId = ((e.target as unknown) as { id: string }).id;
-                console.log('mouseDown', curId);
+
                 // 如果当前元素没有id，就啥也不干
                 if (!curId) return;
                 // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
                 // 把downKeys数组设置为只有当前鼠标按下的
-                playKey(curId);
-                setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
+                let key = [test.flat(3).find((item) => item.id === curId)?.value ?? ''];
+                playKey(key[0]);
+                setDownKeys(key);
             }}
             onMouseUp={(e) => {
                 //更新鼠标状态为抬起
                 setMouseDown(false);
-                const curId = ((e.target as unknown) as { id: string }).id;
-                console.log('mouseUp', curId);
-                if (!curId) return;
-                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
-                // 把downKeys数组设置为只有当前鼠标按下的
+
                 setDownKeys([]);
             }}
             onMouseMove={(e) => {
@@ -253,8 +264,9 @@ function Home() {
                 const curId = ((e.target as unknown) as { id: string }).id;
 
                 if (!curId) return;
-                playKey(curId);
-                setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
+                let key = [test.flat(3).find((item) => item.id === curId)?.value ?? ''];
+                playKey(key[0]);
+                setDownKeys(key);
             }}
         >
             <Alert

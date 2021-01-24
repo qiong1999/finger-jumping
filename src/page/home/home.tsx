@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Piano from '../../components/piano/piano';
 import PianoItem from '../../components/piano/pianoItem';
 import Alert from '../../components/alert/alert';
-// 导入音频的base64
 import { chords } from './piano_chords';
+// 引入Tone.js
+import * as Tone from 'tone';
 
 import styles from './home.module.css';
-// 给每个健绑定上chord属性，从c1开始
 const test = [
     [
         { id: '1', value: '1', checked: false, chord: 'C1' },
@@ -60,7 +60,6 @@ const test = [
     ],
 ];
 
-// 建立一个value到id的map
 const v2i = test.flat(3).reduce((prev: Record<string, string>, cur) => {
     prev[cur.value] = cur.id;
     return prev;
@@ -68,13 +67,11 @@ const v2i = test.flat(3).reduce((prev: Record<string, string>, cur) => {
 
 console.log('v2i', v2i);
 
-// 把chord中所有的base64转换为Audio对象
 const chord_music = Object.entries(chords).reduce((prev: Record<string, HTMLAudioElement>, curPair) => {
     prev[curPair[0]] = new Audio(curPair[1]);
     return prev;
 }, {});
 
-// 声明一下画布移动的速度
 const speed = 5;
 
 console.log(chord_music);
@@ -86,9 +83,7 @@ interface paramProps {
 
 function Home() {
     const [keyState, setKey] = useState(test);
-    // 新建一个数组 存储当前按下的所有按键
     const [downKeys, setDownKeys] = useState<string[]>([]);
-    // 新建一个状态 存储鼠标是否按下
     const [mouseDown, setMouseDown] = useState<boolean>(false);
     const Lists = keyState.map((item, index) => {
         return <PianoItem keyValue={item} key={index}></PianoItem>;
@@ -99,7 +94,6 @@ function Home() {
                 itt.checked = false;
                 if (itt.value === param.value) {
                     itt.checked = true;
-                    //1console.log('itt', itt);
                 }
                 if (itt.checked === true) {
                     console.log(itt);
@@ -110,22 +104,18 @@ function Home() {
         setKey(temp);
     };
 
-    // 当按下一个key的时候，就把它加入到当前正处于按下状态的key数组
     const handleKeyDown = (value: string) => {
         setDownKeys([...new Set([...downKeys, value])]);
     };
 
-    // 当抬起一个key的时候，就把它移出数组
     const handleKeyUp = (value: string) => {
         setDownKeys([...downKeys.filter((key) => key !== value)]);
     };
 
     const realTimeChords = useRef<string[]>([]);
-    // 新建一个ref 用于绑定canvas
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const drawChords = () => {
-        // 把当前正在处于按下状态的按键数组转换为案件对应的dom的clientRect的数组
         const keyDoms = realTimeChords.current.map((value) => {
             const id = v2i[value];
             const curDom = document.getElementById(id);
@@ -135,12 +125,8 @@ function Home() {
 
         if (canvasRef.current) {
             const ctx: CanvasRenderingContext2D = canvasRef.current.getContext('2d') as CanvasRenderingContext2D;
-            // 把已经画过的内容向上移动{speed}px
-            // 先把当前画布的图像存起来
             let snapshot = ctx.getImageData(0, 0, window.innerWidth, window.innerHeight);
-            // 清空当前画布
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-            // 再把存起来的图像放回画布，不过要向上移动{speed}px
             ctx.putImageData(snapshot, 0, -speed);
             for (let dom of keyDoms) {
                 if (dom) {
@@ -153,36 +139,27 @@ function Home() {
             }
         }
 
-        // 使用requestAnimationFrame递归调用drawChords函数
-        // 可以让这个函数以每秒六十次的速度被调用
         requestAnimationFrame(drawChords);
     };
 
     useEffect(() => {
         drawChords();
         if (canvasRef.current) {
-            // 等到canvas在页面上被渲染出来，并且绑定好ref之后才能通过ref.current拿到dom节点
-            // 把canvas铺满整个屏幕
             canvasRef.current.width = window.innerWidth;
             canvasRef.current.height = window.innerHeight;
         }
         window.addEventListener('resize', () => {
             if (canvasRef.current) {
-                // 等到canvas在页面上被渲染出来，并且绑定好ref之后才能通过ref.current拿到dom节点
-                // 把canvas铺满整个屏幕
                 canvasRef.current.width = window.innerWidth;
                 canvasRef.current.height = window.innerHeight;
             }
         });
     }, []);
 
-    // 监听downKeys数组，当数组发生变化（数组发生变化说明按键变化）的时候更新界面
     useEffect(() => {
-        // 这里可以借用你写好的逻辑
         let temp = keyState.map((item) => {
             return item.map((itt) => {
                 itt.checked = false;
-                // 如果按下按键的数组中有当前遍历到的item的value
                 if (downKeys.includes(itt.value)) {
                     itt.checked = true;
                 }
@@ -196,11 +173,11 @@ function Home() {
     const playKey = (musicKey: string) => {
         if (musicKey) {
             let curMusicChord = test.flat(3).find((item) => item.id === musicKey)?.chord;
-            // 如果chord找到了
             if (curMusicChord) {
-                // 将audio的进度重置为0
-                chord_music[curMusicChord].currentTime = 0;
-                chord_music[curMusicChord].play();
+                // 新建一个音符然后播放它
+                const synth = new Tone.Synth().toDestination();
+
+                synth.triggerAttackRelease('C4', '8n');
             }
         }
     };
@@ -217,41 +194,25 @@ function Home() {
                 handleKeyUp(e.key);
             }}
             onMouseDown={(e) => {
-                // 更新鼠标状态为按下
                 setMouseDown(true);
-                // 把当前按下的按键加入到数组中
-                // 通过e.target可以获取到当前鼠标在哪个键上
-                // ts不让获取target上的id，但其实上边有id，所以需要进行一下类型转换，先
-                // 转换为unknown 在转化为{id: string}，就可以拿到id了
                 const curId = ((e.target as unknown) as { id: string }).id;
-                // 如果当前元素没有id，就啥也不干
                 if (!curId) return;
-                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
-                // 把downKeys数组设置为只有当前鼠标按下的
                 playKey(curId);
                 setDownKeys([test.flat(3).find((item) => item.id === curId)?.value ?? '']);
             }}
             onMouseUp={(e) => {
-                // 更新鼠标状态为抬起
                 setMouseDown(false);
                 const curId = ((e.target as unknown) as { id: string }).id;
-                // 如果当前元素没有id，就啥也不干
                 if (!curId) return;
-                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
-                // 把downKeys数组设置为只有当前鼠标按下的
                 setDownKeys([]);
             }}
             onMouseMove={(e) => {
-                // 如果鼠标没按下的话 return出去啥也不做
                 if (!mouseDown) return;
                 const curId = ((e.target as unknown) as { id: string }).id;
                 const curKeyValue = test.flat(3).find((item) => item.id === curId)?.value ?? '';
                 if (downKeys[0] === curKeyValue) return;
-                // 如果当前元素没有id，就啥也不干
                 if (!curId) return;
                 playKey(curId);
-                // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
-                // 把downKeys数组设置为只有当前鼠标按下的
                 setDownKeys([curKeyValue]);
             }}
         >
@@ -262,9 +223,7 @@ function Home() {
             >
                 {Lists}
             </Piano>
-            {
-                // 直接把ref传入 元素的ref属性就可以完成绑定
-            }
+            {}
             <canvas ref={canvasRef} style={{ backgroundColor: 'white', width: '100vw', height: '100vh' }}></canvas>
         </div>
     );

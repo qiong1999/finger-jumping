@@ -147,7 +147,6 @@ function Home() {
         requestAnimationFrame(drawChords);
     };
     const playKey = (musicKey: string) => {
-        console.log('触发', musicKey);
         if (musicKey) {
             let curMusicChord = test.flat(3).find((item) => item.value === musicKey)?.chord;
             //如果chord找到了
@@ -155,7 +154,7 @@ function Home() {
                 //将audio的进度重置为
                 const synth = new Tone.Synth().toDestination();
                 const now = Tone.now();
-                synth.triggerAttackRelease(curMusicChord, '2n', now);
+                synth.triggerAttackRelease(curMusicChord, '10n', now);
             }
         }
     };
@@ -171,6 +170,16 @@ function Home() {
             return item;
         });
         setKey(tempKeys);
+    };
+    const hasKey = (key: string) => {
+        let temp = downKeys;
+        let flag = false;
+        for (let i = 0; i < temp.length; i++) {
+            if (temp[i] === key) {
+                flag = true;
+            }
+        }
+        return flag;
     };
     useEffect(() => {
         if (canvasRef.current) {
@@ -225,6 +234,7 @@ function Home() {
         <div
             className={styles.container}
             onKeyDown={(e) => {
+                if (hasKey(e.key)) return;
                 handleKeyDown(e.key);
                 playKey(e.key);
             }}
@@ -265,6 +275,7 @@ function Home() {
 
                 if (!curId) return;
                 let key = [test.flat(3).find((item) => item.id === curId)?.value ?? ''];
+                if (hasKey(key[0])) return;
                 playKey(key[0]);
                 setDownKeys(key);
             }}

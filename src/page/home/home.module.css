@@ -8,13 +8,14 @@
     position: relative;
     width: 100vw;
     height: 100vh;
+    background-color: red;
 }
 
 .footer {
     position: absolute;
     bottom: 15px;
     min-width: 1150px;
-
+    background: yellow;
     left: 50%;
     transform: translateX(-50%);
 }

@@ -6,6 +6,7 @@ import Alert from '../../components/alert/alert';
 import { chords } from '../../piano_chords';
 
 import styles from './home.module.css';
+
 const test = [
     [
         { id: '1113', value: 'A', checked: false, chord: 'C2' },
@@ -76,16 +77,13 @@ const vtoi = test.flat(3).reduce((acc: Record<string, string>, cur) => {
     return acc;
 }, {});
 //console.log(vtoi);
-//把chord 中所有的base64转换为Audio 对象
-const chord_music = Object.entries(chords).reduce((prev: Record<string, HTMLAudioElement>, curPair) => {
-    prev[curPair[0]] = new Audio(curPair[1]);
-    return prev;
-}, {});
+
 //声明画布移动的速度
 const speed = 3;
 function Home() {
     //存储钢琴信息
     const [keyState, setKey] = useState(test);
+
     //存储鼠标是否按下
     const [downKeys, setDownKeys] = useState<string[]>([]);
     //存储鼠标当前在哪个key上，由于鼠标一次只能有一个key，所以只需存一次
@@ -135,7 +133,7 @@ function Home() {
                     if (dom) {
                         ctx.beginPath();
                         ctx.rect(dom?.left, dom.top - speed, dom?.width, 70);
-                        ctx.fillStyle = 'pink';
+                        ctx.fillStyle = 'transparent';
                         ctx.fill();
                         ctx.closePath();
                         ctx.drawImage(img, dom?.left, dom.top + 20, 21, 50);
@@ -149,6 +147,7 @@ function Home() {
         requestAnimationFrame(drawChords);
     };
     const playKey = (musicKey: string) => {
+        console.log('触发', musicKey);
         if (musicKey) {
             let curMusicChord = test.flat(3).find((item) => item.value === musicKey)?.chord;
             //如果chord找到了
@@ -156,7 +155,7 @@ function Home() {
                 //将audio的进度重置为
                 const synth = new Tone.Synth().toDestination();
                 const now = Tone.now();
-                synth.triggerAttackRelease(curMusicChord, '2n');
+                synth.triggerAttackRelease(curMusicChord, '2n', now);
             }
         }
     };
@@ -174,7 +173,6 @@ function Home() {
         setKey(tempKeys);
     };
     useEffect(() => {
-        drawChords();
         if (canvasRef.current) {
             canvasRef.current.width = window.innerWidth;
             canvasRef.current.height = window.innerHeight;
@@ -249,6 +247,7 @@ function Home() {
                 // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
                 // 把downKeys数组设置为只有当前鼠标按下的
                 let key = [test.flat(3).find((item) => item.id === curId)?.value ?? ''];
+                drawChords();
                 playKey(key[0]);
                 setDownKeys(key);
             }}
@@ -261,6 +260,7 @@ function Home() {
             onMouseMove={(e) => {
                 //如果鼠标没有按下的话,什么都不做
                 if (!mouseDown) return;
+
                 const curId = ((e.target as unknown) as { id: string }).id;
 
                 if (!curId) return;

@@ -214,9 +214,17 @@ function Home() {
             }
             setDisplay('block');
         });
+        document.addEventListener('keydown', (e) => {
+            if (hasKey(e.key)) return;
+            handleKeyDown(e.key);
+            playKey(e.key);
+            drawChords();
+        });
+        document.addEventListener('keyup', (e) => {
+            handleKeyUp(e.key);
+        });
     }, []);
     useEffect(() => {
-        // drawChords();
         let temp = keyState.map((item) => {
             return item.map((itt) => {
                 itt.checked = false;
@@ -233,14 +241,6 @@ function Home() {
     return (
         <div
             className={styles.container}
-            onKeyDown={(e) => {
-                if (hasKey(e.key)) return;
-                handleKeyDown(e.key);
-                playKey(e.key);
-            }}
-            onKeyUp={(e) => {
-                handleKeyUp(e.key);
-            }}
             onMouseDown={(e) => {
                 // 更新鼠标状态为按下
                 setMouseDown(true);
@@ -257,8 +257,8 @@ function Home() {
                 // 找到test数组中指定id的value，当然首先要用flat方法把数组打平，让它只有一个层级
                 // 把downKeys数组设置为只有当前鼠标按下的
                 let key = [test.flat(3).find((item) => item.id === curId)?.value ?? ''];
-                drawChords();
                 playKey(key[0]);
+                drawChords();
                 setDownKeys(key);
             }}
             onMouseUp={(e) => {

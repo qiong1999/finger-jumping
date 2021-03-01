@@ -40,18 +40,18 @@ export const Alert: FC<BaseAlertProps> = (props) => {
     return (
         <div className={styles.container} style={ownStyle}>
             <div className={styles.subMenu}></div>
-            <div className={classes}>
+            <div className={styles.classes}>
                 <div
                     className={styles.close}
                     onClick={() => {
                         handleClick?.('none');
                     }}
                 ></div>
-                <div>自定义琴键</div>
-                <div>绑定按键</div>
-                <input ref={valueSelect} className={styles.inp} placeholder="输入选择键盘键" />
+                <div className={styles.state}>自定义琴键</div>
+                <div className={styles.state}>绑定按键:</div>
+                <input ref={valueSelect} className={styles.inp} placeholder="输入键盘键" />
 
-                <div>设定琴音</div>
+                <div className={styles.state}>设定琴音:</div>
                 <select ref={chordSelect} className={styles.select}>
                     {optionLists}
                 </select>
